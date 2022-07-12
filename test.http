@@ -1,0 +1,81 @@
+POST http://localhost:8000/update-data
+Content-Type: application/json
+
+{
+    "table_name": "events",
+    "upsert": [
+        {
+            "user_id": 10,
+            "event_id": 1,
+            "event": {
+                "event_type": "click",
+                "lang": "ru",
+                "offer_id": 1
+            }
+        },
+        {
+            "user_id": 10,
+            "event_id": 2,
+            "event": {
+                "event_type": "click",
+                "lang": "ru",
+                "offer_id": 2
+            }
+        }
+    ]
+}
+
+###
+POST http://localhost:8000/update-data
+Content-Type: application/json
+
+{
+    "table_name": "events",
+    "delete": [
+        {
+            "user_id": 1,
+            "event_id": 1
+        }
+    ]
+}
+
+###
+POST http://localhost:8000/upsert
+Content-Type: application/json
+
+{
+    "table_name": "events",
+    "data": [
+        {
+            "user_id": 1,
+            "event_id": 6,
+            "event": {
+                "event_type": "click",
+                "lang": "ru",
+                "offer_id": 6
+            }
+        }
+    ]
+}
+
+###
+POST http://localhost:8000/get-data
+Content-Type: application/json
+
+{
+    "table_name": "events",
+    "idx": [
+        {"user_id": 10}
+    ]
+}
+
+###
+POST http://localhost:8000/get-data
+Content-Type: application/json
+
+{
+    "table_name": "user_lang",
+    "idx": [
+        {"user_id": 10}
+    ]
+}
