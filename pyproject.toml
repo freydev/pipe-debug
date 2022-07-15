@@ -6,7 +6,7 @@ authors = ["Andrey Tatarinov <a@tatarinov.co>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-datapipe-core = "0.11.0-beta.5"
+datapipe-core = "0.11.0-beta.6"
 fastapi = "^0.78.0"
 uvicorn = {extras = ["standard"], version = "^0.18.2"}
 
