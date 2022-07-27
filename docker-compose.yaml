@@ -5,6 +5,7 @@ services:
     build: .
     environment:
       DB_CONN_URI: "postgresql://postgres:postgres@postgres:5432/postgres"
+      PORT: 8000
     ports:
       - 8000:8000
     

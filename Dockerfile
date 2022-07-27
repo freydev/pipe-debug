@@ -12,9 +12,6 @@ RUN poetry config virtualenvs.create false && poetry install --no-dev
 
 COPY . /app
 
-ENV PORT 8000
-
-
 # For tests use 'export $(cat .env | xargs)'
 
-CMD exec uvicorn api:app --host=0.0.0.0 --port=8000
+CMD exec uvicorn api:app --host=0.0.0.0 --port=$PORT
