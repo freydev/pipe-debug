@@ -1,6 +1,16 @@
 version: "3"
 
 services:
+  app:
+    build: .
+    environment:
+      DB_CONN_URI: "postgresql://postgres:postgres@postgres:5432/postgres"
+    ports:
+      - 8000:8000
+    
+    links:
+      - postgres
+
   postgres:
     image: postgres:14
     environment:

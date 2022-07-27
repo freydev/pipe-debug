@@ -40,25 +40,6 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:8000/upsert
-Content-Type: application/json
-
-{
-    "table_name": "events",
-    "data": [
-        {
-            "user_id": 1,
-            "event_id": 6,
-            "event": {
-                "event_type": "click",
-                "lang": "ru",
-                "offer_id": 6
-            }
-        }
-    ]
-}
-
-###
 POST http://localhost:8000/get-data
 Content-Type: application/json
 

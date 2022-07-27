@@ -1,3 +1,4 @@
+import os
 from sqlalchemy import JSON, Column, Integer, String
 
 import pandas as pd
@@ -6,9 +7,12 @@ from datapipe.core_steps import BatchTransform
 from datapipe.compute import DataStore, Catalog, Table, Pipeline, build_compute
 from datapipe.store.database import TableStoreDB, DBConn
 
+DB_CONN_URI = os.environ.get('DB_CONN_URI', "sqlite:///store.sqlite")
+
 # dbconn = DBConn("sqlite:///store.sqlite")
 # dbconn = DBConn("sqlite:///:memory:")
-dbconn = DBConn("postgresql://postgres:postgres@localhost:5432/postgres")
+# dbconn = DBConn("postgresql://postgres:postgres@localhost:5432/postgres")
+dbconn = DBConn(DB_CONN_URI)
 
 catalog = Catalog({
     "events": Table(

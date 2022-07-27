@@ -13,10 +13,41 @@ from pipeline import steps, catalog, ds
 app = FastAPI()
 
 
+class PipelineStepResponse(BaseModel):
+    type: str
+    name: str
+    inputs: List[str]
+    outputs: List[str]
+
+
+class GraphResponse(BaseModel):
+    catalog: Dict
+    pipeline: List[PipelineStepResponse]
+
+
 class UpdateDataRequest(BaseModel):
     table_name: str
     upsert: Optional[List[Dict]] = None
     # delete: List[Dict] = None
+
+
+@app.get("/graph", response_model=GraphResponse)
+def get_graph() -> GraphResponse:
+    return GraphResponse(
+        catalog={
+            table_name: {}
+            for table_name in catalog.catalog.keys()
+        },
+        pipeline=[
+            PipelineStepResponse(
+                type="transform",
+                name=step.get_name(),
+                inputs=[i.name for i in step.get_input_dts()],
+                outputs=[i.name for i in step.get_output_dts()],
+            )
+            for step in steps
+        ]
+    )
 
 
 @app.post("/update-data")
