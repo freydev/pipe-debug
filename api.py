@@ -77,13 +77,35 @@ def update_data(req: UpdateDataRequest):
     }
 
 
-class GetDataRequest(BaseModel):
+class GetDataResponse(BaseModel):
+    page: int
+    page_size: int
+    total: int
+    data: List[Dict]
+
+
+# /table/<table_name>?page=1&id=111&another_filter=value&sort=<+|->column_name
+@app.get("/get-data", )
+def get_data(table: str, page: int = 0, page_size: int = 20):
+    dt = catalog.get_datatable(ds, table)
+
+    meta_df = dt.get_metadata()
+
+    return GetDataResponse(
+        page = page,
+        page_size = page_size,
+        total = len(meta_df),
+        data = dt.get_data(meta_df.iloc[page*page_size:(page+1)*page_size]).to_dict(orient="records")
+    )
+
+
+class GetDataByIdxRequest(BaseModel):
     table_name: str
     idx: List[Dict]
 
 
-@app.post("/get-data")
-def get_data(req: GetDataRequest):
+@app.post("/get-data-by-idx")
+def get_data_by_idx(req: GetDataByIdxRequest):
     dt = catalog.get_datatable(ds, req.table_name)
 
     res = dt.get_data(idx = pd.DataFrame.from_records(req.idx))
