@@ -2,6 +2,7 @@ from typing import List, Dict, Optional
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import pandas as pd
 
@@ -14,6 +15,13 @@ from pipeline import steps, catalog, ds
 app = FastAPI()
 app.mount("/", StaticFiles(directory="/static", html=True), name="static")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class PipelineStepResponse(BaseModel):
     type: str
