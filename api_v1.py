@@ -117,6 +117,46 @@ def get_data(table: str, page: int = 0, page_size: int = 20):
     )
 
 
+class FocusFilter(BaseModel):
+    table_name: str
+    items_idx: List[Dict]
+
+
+class GetDataWithFocusRequest(BaseModel):
+    table_name: str
+
+    page: int = 0
+    page_size: int = 20
+
+    focus: Optional[FocusFilter] = None
+
+
+@app.post("/get-data-with-focus", response_model=GetDataResponse)
+def get_data_with_focus(req: GetDataWithFocusRequest) -> GetDataResponse:
+    dt = catalog.get_datatable(ds, req.table_name)
+
+    if req.focus is not None:
+        idx = pd.DataFrame.from_records([
+            {
+                k: v
+                for k,v in item.items()
+                if k in dt.primary_keys
+            }
+            for item in req.focus.items_idx
+        ])
+    else:
+        idx = None
+
+    existing_idx = dt.meta_table.get_existing_idx(idx=idx)
+
+    return GetDataResponse(
+        page = req.page,
+        page_size = req.page_size,
+        total = len(existing_idx),
+        data = dt.get_data(existing_idx.iloc[req.page*req.page_size:(req.page+1)*req.page_size]).to_dict(orient="records")
+    )
+
+
 class GetDataByIdxRequest(BaseModel):
     table_name: str
     idx: List[Dict]

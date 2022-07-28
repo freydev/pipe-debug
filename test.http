@@ -94,7 +94,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:8000/get-data
+POST http://localhost:8000/api/v1/get-data-by-idx
 Content-Type: application/json
 
 {
@@ -105,4 +105,19 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:8000/get-data?table=user_lang
+GET http://localhost:8000/api/v1/get-data?table=user_lang
+
+
+###
+POST http://localhost:8000/api/v1/get-data-with-focus
+Content-Type: application/json
+
+{
+    "table_name": "events",
+    "focus": {
+        "table_name": "events",
+        "items_idx": [
+            {"event_id": 1}
+        ]
+    }
+}
