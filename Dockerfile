@@ -1,3 +1,10 @@
+FROM node:18.7.0-slim AS frontend-build
+
+WORKDIR /srv
+ADD frontend/ /srv/
+
+RUN yarn && yarn build
+
 FROM python:3.8
 
 ENV PYTHONUNBUFFERED 1
@@ -11,6 +18,7 @@ COPY poetry.lock pyproject.toml /app/
 RUN poetry config virtualenvs.create false && poetry install --no-dev
 
 COPY . /app
+COPY --from=frontend-build /srv/build /static
 
 # For tests use 'export $(cat .env | xargs)'
 
