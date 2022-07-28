@@ -1,6 +1,7 @@
 from typing import List, Dict, Optional
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import pandas as pd
 
@@ -11,6 +12,7 @@ from pipeline import steps, catalog, ds
 
 
 app = FastAPI()
+app.mount("/", StaticFiles(directory="/static", html=True), name="static")
 
 
 class PipelineStepResponse(BaseModel):
