@@ -21,6 +21,60 @@ Content-Type: application/json
                 "lang": "ru",
                 "offer_id": 2
             }
+        },
+        {
+            "user_id": 2,
+            "event_id": 1,
+            "event": {
+                "event_type": "click",
+                "lang": "ru",
+                "offer_id": 1
+            }
+        },
+        {
+            "user_id": 2,
+            "event_id": 2,
+            "event": {
+                "event_type": "click",
+                "lang": "en",
+                "offer_id": 2
+            }
+        },
+        {
+            "user_id": 3,
+            "event_id": 1,
+            "event": {
+                "event_type": "click",
+                "lang": "ru",
+                "offer_id": 1
+            }
+        },
+        {
+            "user_id": 3,
+            "event_id": 2,
+            "event": {
+                "event_type": "click",
+                "lang": "de",
+                "offer_id": 2
+            }
+        },
+        {
+            "user_id": 4,
+            "event_id": 1,
+            "event": {
+                "event_type": "click",
+                "lang": "ru",
+                "offer_id": 1
+            }
+        },
+        {
+            "user_id": 4,
+            "event_id": 2,
+            "event": {
+                "event_type": "click",
+                "lang": "fr",
+                "offer_id": 2
+            }
         }
     ]
 }
@@ -51,12 +105,4 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:8000/get-data
-Content-Type: application/json
-
-{
-    "table_name": "user_lang",
-    "idx": [
-        {"user_id": 10}
-    ]
-}
+GET http://localhost:8000/get-data?table=user_lang
