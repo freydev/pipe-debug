@@ -20,8 +20,17 @@ class PipelineStepResponse(BaseModel):
     outputs: List[str]
 
 
+class TableResponse(BaseModel):
+    name: str
+
+    indexes: List[str]
+
+    size: int
+    store_class: str
+
+
 class GraphResponse(BaseModel):
-    catalog: Dict
+    catalog: Dict[str, TableResponse]
     pipeline: List[PipelineStepResponse]
 
 
@@ -33,9 +42,19 @@ class UpdateDataRequest(BaseModel):
 
 @app.get("/graph", response_model=GraphResponse)
 def get_graph() -> GraphResponse:
+    def table_response(table_name):
+        tbl = catalog.get_datatable(ds, table_name)
+
+        return TableResponse(
+            name = tbl.name,
+            indexes = tbl.primary_keys,
+            size = len(tbl.get_metadata()), ### FIXME add get_size method
+            store_class = tbl.table_store.__class__.__name__
+        )
+
     return GraphResponse(
         catalog={
-            table_name: {}
+            table_name: table_response(table_name)
             for table_name in catalog.catalog.keys()
         },
         pipeline=[
