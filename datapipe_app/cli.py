@@ -2,9 +2,9 @@ import sys
 import os.path
 import click
 
-from opentelemetry import trace
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import (
+from opentelemetry import trace  # type: ignore
+from opentelemetry.sdk.trace import TracerProvider  # type: ignore
+from opentelemetry.sdk.trace.export import (  # type: ignore
     BatchSpanProcessor,
     ConsoleSpanExporter,
 )
@@ -70,11 +70,8 @@ def cli(
         trace.set_tracer_provider(provider)
 
     if trace_jaeger:
-        from opentelemetry import trace
-        from opentelemetry.exporter.jaeger.thrift import JaegerExporter
-        from opentelemetry.sdk.resources import SERVICE_NAME, Resource
-        from opentelemetry.sdk.trace import TracerProvider
-        from opentelemetry.sdk.trace.export import BatchSpanProcessor
+        from opentelemetry.exporter.jaeger.thrift import JaegerExporter  # type: ignore
+        from opentelemetry.sdk.resources import SERVICE_NAME, Resource  # type: ignore
 
         trace.set_tracer_provider(
             TracerProvider(
