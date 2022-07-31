@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from datapipe.compute import build_compute
 
-import datapipe_app.api_v1 as api_v1
+import datapipe_app.api_v1alpha1 as api_v1alpha1
 
 
 class DatapipeApp(FastAPI):
@@ -29,9 +29,9 @@ class DatapipeApp(FastAPI):
             allow_headers=["*"],
         )
 
-        api_v1_app = api_v1.DatpipeAPIv1(ds, catalog, pipeline, self.steps)
+        api_v1_app = api_v1alpha1.DatpipeAPIv1(ds, catalog, pipeline, self.steps)
 
-        self.mount("/api/v1", api_v1_app, name="api_v1")
+        self.mount("/api/v1alpha1", api_v1_app, name="api_v1")
         self.mount("/", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "frontend/"), html=True), name="static")
 
 
