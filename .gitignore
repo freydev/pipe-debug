@@ -6,3 +6,8 @@ venv
 .env-local
 .idea
 node_modules
+
+datapipe_app/frontend/
+build/
+dist/
+*.egg-info/
