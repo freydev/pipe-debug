@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Cytoscape from 'cytoscape';
 import CytoscapeComponent from 'react-cytoscapejs'
 import "cytoscape-context-menus/cytoscape-context-menus.css";
