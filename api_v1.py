@@ -2,6 +2,7 @@ from typing import List, Dict, Optional
 
 from fastapi import FastAPI
 from pydantic import BaseModel
+
 import pandas as pd
 
 from datapipe.types import ChangeList
@@ -9,9 +10,7 @@ from datapipe.compute import run_steps_changelist
 
 from pipeline import steps, catalog, ds
 
-
 app = FastAPI()
-
 
 class PipelineStepResponse(BaseModel):
     type: str
@@ -104,7 +103,7 @@ class GetDataResponse(BaseModel):
 
 
 # /table/<table_name>?page=1&id=111&another_filter=value&sort=<+|->column_name
-@app.get("/get-data", )
+@app.get("/get-data", response_model=GetDataResponse)
 def get_data(table: str, page: int = 0, page_size: int = 20):
     dt = catalog.get_datatable(ds, table)
 
@@ -115,6 +114,46 @@ def get_data(table: str, page: int = 0, page_size: int = 20):
         page_size = page_size,
         total = len(meta_df),
         data = dt.get_data(meta_df.iloc[page*page_size:(page+1)*page_size]).to_dict(orient="records")
+    )
+
+
+class FocusFilter(BaseModel):
+    table_name: str
+    items_idx: List[Dict]
+
+
+class GetDataWithFocusRequest(BaseModel):
+    table_name: str
+
+    page: int = 0
+    page_size: int = 20
+
+    focus: Optional[FocusFilter] = None
+
+
+@app.post("/get-data-with-focus", response_model=GetDataResponse)
+def get_data_with_focus(req: GetDataWithFocusRequest) -> GetDataResponse:
+    dt = catalog.get_datatable(ds, req.table_name)
+
+    if req.focus is not None:
+        idx = pd.DataFrame.from_records([
+            {
+                k: v
+                for k,v in item.items()
+                if k in dt.primary_keys
+            }
+            for item in req.focus.items_idx
+        ])
+    else:
+        idx = None
+
+    existing_idx = dt.meta_table.get_existing_idx(idx=idx)
+
+    return GetDataResponse(
+        page = req.page,
+        page_size = req.page_size,
+        total = len(existing_idx),
+        data = dt.get_data(existing_idx.iloc[req.page*req.page_size:(req.page+1)*req.page_size]).to_dict(orient="records")
     )
 
 
@@ -130,3 +169,4 @@ def get_data_by_idx(req: GetDataByIdxRequest):
     res = dt.get_data(idx = pd.DataFrame.from_records(req.idx))
 
     return res.to_dict(orient="records")
+
