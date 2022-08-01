@@ -1,5 +1,5 @@
 interface PipeTable {
-  name: string,
+  id: string,
   indexes: string[],
   size: number,
   store_class: string
