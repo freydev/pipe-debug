@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Cytoscape from 'cytoscape';
 import CytoscapeComponent from 'react-cytoscapejs'
 import "cytoscape-context-menus/cytoscape-context-menus.css";
@@ -11,20 +11,22 @@ import contextMenus from 'cytoscape-context-menus';
 
 import './style.css';
 import { reprocess_data } from './process';
-import { Drawer, Spin } from 'antd';
 import { stylesheet } from './stylesheet';
 import { Table } from '../table';
+import { Drawer, Spin } from 'antd';
+import { PipeTable } from '../../types';
 
 Cytoscape.use(nodeHtmlLabel);
 Cytoscape.use(dagre);
 Cytoscape.use(contextMenus);
 
 function Cy() {
-  const [drawerWidth, setWidth] = useState(400);
+  const [drawerWidth, setWidth] = useState(600);
   const [visible, setVisible] = useState(false);
   const [graphData, setGraphData] = useState<Cytoscape.ElementDefinition[]>([]);
-  const [currentTable, setCurrentTable] = useState('');
+  const [currentTable, setCurrentTable] = useState<PipeTable>();
   const [loading, setLoading] = useState(false);
+  const [cy, setCy] = useState<Cytoscape.Core>();
 
   useEffect(() => {
     async function loadGraph() {
@@ -62,7 +64,10 @@ function Cy() {
     loadGraph()
   }, []);
 
-  const cyHandler = useCallback((cy: Cytoscape.Core) => {
+  useEffect(() => {
+    if (cy === undefined) return;
+    if (cy.elements().length === 0) return;
+    if (loading) return;
     cy.layout({
       name: 'dagre',
       nodeDimensionsIncludeLabels: true,
@@ -72,28 +77,47 @@ function Cy() {
     } as dagre.DagreLayoutOptions).run();
 
     // @ts-ignore
-    cy.contextMenus({
-      evtType: "cxttap",
-      menuItems: [
-        {
-          id: "details",
-          content: "View Details...",
-          tooltipText: "View Details",
-          selector: 'node[type = "table"]',
-          onClickFunction: function (event: Cytoscape.EventObject) {
-            setCurrentTable(event.target.data('id'));
-            setVisible(true);
-          },
-          hasTrailingDivider: true
-        },
-      ],
-      menuItemClasses: ["custom-menu-item", "custom-menu-item:hover"],
-      contextMenuClasses: ["custom-context-menu"]
+    // cy.contextMenus({
+    //   evtType: "cxttap",
+    //   menuItems: [
+    //     {
+    //       id: "details",
+    //       content: "View Details...",
+    //       tooltipText: "View Details",
+    //       selector: 'node[type = "table"]',
+    //       onClickFunction: function (event: Cytoscape.EventObject) {
+    //         setCurrentTable(event.target.data());
+    //         setVisible(true);
+    //       },
+    //       hasTrailingDivider: true
+    //     },
+    //   ],
+    //   menuItemClasses: ["custom-menu-item", "custom-menu-item:hover"],
+    //   contextMenuClasses: ["custom-context-menu"]
+    // });
+
+    cy.on('tap', event => {
+      const node = event.target;
+      if (node === cy) {
+        setVisible(false);
+        return;
+      }
     });
 
-    cy.on('select', 'node', node => {
-      node.target.connectedEdges().forEach((edge: any) => {
-        if (edge.target().id() !== node.target.id()) {
+    cy.on('select', 'node', selected => {
+      const node = selected.target;
+      if (node === cy) {
+        setVisible(false);
+        return;
+      }
+
+      if (node.data('type') === 'table') {
+        setCurrentTable(node.data());
+        setVisible(true);
+      }
+
+      node.connectedEdges().forEach((edge: any) => {
+        if (edge.target().id() !== node.id()) {
           edge.select()
         }
       });
@@ -125,26 +149,29 @@ function Cy() {
         }
       },
     ])
-  }, [])
+  }, [cy, loading])
 
   return (
     <>
       {loading && <Spin className="spin" spinning={true} />}
-      <Drawer width={drawerWidth} title={currentTable} onClose={() => setVisible(false)} visible={visible}>
+      <Drawer
+        mask={false}
+        autoFocus={false}
+        width={drawerWidth} title={<>Table: <span style={{ color: 'blue' }}>{currentTable?.id}</span></>} onClose={() => setVisible(false)} visible={visible}>
         <Hammer
           direction={'DIRECTION_HORIZONTAL'}
           onPan={(pan) => {
-            setWidth(window.innerWidth - pan.center.x)
+            setWidth(Math.max(window.innerWidth - pan.center.x, 600))
           }}>
           <div className="dragger">
             <div className="drag-badge">=</div>
           </div>
         </Hammer>
-        <Table name={currentTable} />
+        {currentTable && <Table current={currentTable} />}
       </Drawer>
       <CytoscapeComponent
         stylesheet={stylesheet}
-        cy={cyHandler}
+        cy={setCy}
         autoungrabify
         elements={graphData}
         className="cy-container"/>
