@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Table as AntTable, TablePaginationConfig } from 'antd'
 import { ColumnsType } from 'antd/lib/table';
 import ReactJson from 'react-json-view';
-import { omit, parseInt } from 'lodash';
 import { PipeTable } from '../../types';
 
 interface Options {
@@ -17,17 +16,6 @@ interface FocusType {
   indexes: {
     [name: string]: string | number;
   }
-}
-
-function getTextWidth(text: string, font= "14px") {
-  const canvas = document.createElement("canvas");
-  let context = canvas.getContext("2d");
-  if (context) {
-    context.font = font
-    let textMetrics = context.measureText(text)
-    return textMetrics.width;
-  }
-  return 0;
 }
 
 function Table({current}: { current: PipeTable }) {
@@ -72,7 +60,11 @@ function Table({current}: { current: PipeTable }) {
       response = await fetch(process.env['REACT_APP_GET_TABLE_URL'] as string + `?${url}`);
     }
     const data = await response.json();
-
+    if (data.data.length === 0) {
+      setLoading(false);
+      setData([]);
+      return;
+    }
 
     setColumns(Object.keys(data.data[0]).map(column => {
       return {
@@ -162,7 +154,7 @@ function Table({current}: { current: PipeTable }) {
     </div>
     <AntTable
       loading={loading}
-      showHeader={!loading}
+      showHeader={!loading && data?.length > 0}
       onChange={changeHandler}
       rowKey={(record) => {
         const idx_string = current.indexes.reduce((acc, value) => {
