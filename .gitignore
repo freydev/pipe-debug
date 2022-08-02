@@ -11,3 +11,5 @@ datapipe_app/frontend/
 build/
 dist/
 *.egg-info/
+
+poetry.lock
