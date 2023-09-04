@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Table as AntTable, TablePaginationConfig } from 'antd'
 import { ColumnsType } from 'antd/lib/table';
 import ReactJson from 'react-json-view';
@@ -60,7 +60,7 @@ function Table({current}: { current: PipeTable }) {
       response = await fetch(process.env['REACT_APP_GET_TABLE_URL'] as string + `?${url}`);
     }
     const data = await response.json();
-    if (data.data.length === 0) {
+    if (data.total === 0) {
       setLoading(false);
       setData([]);
       return;
@@ -75,7 +75,7 @@ function Table({current}: { current: PipeTable }) {
             const v1 = a[column];
             const v2 = b[column];
             if (!v1 || !v2) return 0;
-            return parseInt(v1) ? parseInt(v1) - parseInt(v2) :
+            return parseFloat(v1) ? parseFloat(v1) - parseFloat(v2) :
               v1.localeCompare(v2)
           }),
         render: value => {
@@ -124,17 +124,17 @@ function Table({current}: { current: PipeTable }) {
     },
   };
 
-  const changeHandler = useCallback((newPagination: TablePaginationConfig) => {
+  const changeHandler = (newPagination: TablePaginationConfig) => {
     if (newPagination.current === options.page && newPagination.pageSize === options.pageSize) return;
     loadTable(newPagination.current, newPagination.pageSize);
-  }, [options])
+  }
 
-  const clearFocus = useCallback(() => {
+  const clearFocus = () => {
     setFocus(undefined);
     if (current.id !== focus?.table_name) {
       loadTable(1, options.pageSize, null)
     }
-  }, [current, options, focus])
+  }
 
   return <>
     <div style={{ height: focus ? 60 : 1, opacity: focus ? 1 : 0, transition: '.2s all ease-out', overflow: 'hidden' }}>
@@ -173,8 +173,6 @@ function Table({current}: { current: PipeTable }) {
       pagination={{
         showSizeChanger: true,
         total: options.total,
-        pageSize: options.pageSize,
-        current: options.page,
         position: ["topRight"]
       }}
       style={{width: '100%'}}

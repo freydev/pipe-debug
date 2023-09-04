@@ -1,5 +1,5 @@
 import { omit } from 'lodash';
-import { GraphData } from '../../types';
+import { GraphData } from '@src/types';
 import Cytoscape from 'cytoscape';
 
 function reprocess_data(data: GraphData) {

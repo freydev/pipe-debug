@@ -1,24 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import Cytoscape from 'cytoscape';
 import CytoscapeComponent from 'react-cytoscapejs'
-import "cytoscape-context-menus/cytoscape-context-menus.css";
 import Hammer from 'react-hammerjs';
 
 // @ts-ignore
 import nodeHtmlLabel from 'cytoscape-node-html-label';
 import dagre from 'cytoscape-dagre';
-import contextMenus from 'cytoscape-context-menus';
 
 import './style.css';
 import { reprocess_data } from './process';
 import { stylesheet } from './stylesheet';
 import { Table } from '../table';
 import { Drawer, Spin } from 'antd';
-import { PipeTable } from '../../types';
+import { PipeTable } from '@src/types';
 
 Cytoscape.use(nodeHtmlLabel);
 Cytoscape.use(dagre);
-Cytoscape.use(contextMenus);
 
 function Cy() {
   const [drawerWidth, setWidth] = useState(600);
@@ -76,26 +73,6 @@ function Cy() {
       rankSep: 20,
     } as dagre.DagreLayoutOptions).run();
 
-    // @ts-ignore
-    // cy.contextMenus({
-    //   evtType: "cxttap",
-    //   menuItems: [
-    //     {
-    //       id: "details",
-    //       content: "View Details...",
-    //       tooltipText: "View Details",
-    //       selector: 'node[type = "table"]',
-    //       onClickFunction: function (event: Cytoscape.EventObject) {
-    //         setCurrentTable(event.target.data());
-    //         setVisible(true);
-    //       },
-    //       hasTrailingDivider: true
-    //     },
-    //   ],
-    //   menuItemClasses: ["custom-menu-item", "custom-menu-item:hover"],
-    //   contextMenuClasses: ["custom-context-menu"]
-    // });
-
     cy.on('tap', event => {
       const node = event.target;
       if (node === cy) {
@@ -140,7 +117,8 @@ function Cy() {
             )
           }; height: 70px">
                 ${data.type === 'table' ? `<div class="icon icon-table"></div>` : ''}
-                <div class="name">${data.label}</div>
+                ${data.type === 'transform' ? `<div class="icon icon-fn"></div>` : ''}
+                <div class="name">${/lambda/.test(data.label) ? 'lambda' : data.label}</div>
                 ${data.indexes ? `<div class="indexes">${data.indexes.join(', ')}</div>` : ''}
                 ${data.size ? `<div class="indexes">size: ${data.size}</div>` : ''}
                 ${data.store_class ? `<div class="store">${data.store_class}</div>` : ''}
