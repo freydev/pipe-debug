@@ -171,6 +171,7 @@ function Table({current}: { current: PipeTable }) {
       }}
       size="small"
       pagination={{
+        current: options.page,
         showSizeChanger: true,
         total: options.total,
         position: ["topRight"]

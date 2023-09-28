@@ -19,8 +19,8 @@ function App() {
         ;
         if (/get-data/.test(url)) {
           const _query = new URLSearchParams(url);
-          const page = _query.get('page') || 0;
-          const pageSize = _query.get('pageSize') || 20;
+          const page = Number(_query.get('page')) || 0;
+          const pageSize = Number(_query.get('pageSize')) || 20;
           import('./example').then(({tableData}) => {
             // @ts-ignore
             return resolve({
